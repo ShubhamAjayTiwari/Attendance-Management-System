@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SRM Institute of Science and Technology - Staff Attendance Management Portal Login">
+    <title>Login | SRM Attendance System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        /* Apply saved theme instantly to prevent flash */
+        (function(){var t=localStorage.getItem('srm-attendance-theme');if(t)document.documentElement.setAttribute('data-theme',t);})();
+    </script>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --primary:#1a56db; --primary-dark:#1040a0; --primary-light:#e8effc;
+            --accent:#2563eb; --bg:#f0f4fa; --surface:#ffffff;
+            --text:#1e293b; --text-muted:#64748b; --border:#e2e8f0;
+            --radius:12px;
+            --shadow-sm:0 1px 3px rgba(0,0,0,.06);
+            --shadow-md:0 4px 24px rgba(26,86,219,.10);
+            --shadow-lg:0 12px 48px rgba(26,86,219,.14);
+            --transition:.25s cubic-bezier(.4,0,.2,1);
+        }
+        [data-theme="dark"] {
+            --primary:#3b82f6; --primary-dark:#2563eb; --primary-light:#1e293b;
+            --accent:#60a5fa; --bg:#0f172a; --surface:#1e293b;
+            --text:#e2e8f0; --text-muted:#94a3b8; --border:#334155;
+            --shadow-sm:0 1px 3px rgba(0,0,0,.3);
+            --shadow-md:0 4px 24px rgba(0,0,0,.3);
+            --shadow-lg:0 12px 48px rgba(0,0,0,.4);
+        }
+
+        body {
+            font-family:'Inter',system-ui,-apple-system,sans-serif;
+            background:var(--bg); color:var(--text);
+            min-height:100vh; display:flex; flex-direction:column;
+            transition:background .3s ease, color .3s ease;
+        }
+
+        .header {
+            background:linear-gradient(135deg,var(--primary),var(--accent));
+            color:#fff; padding:18px 32px;
+            display:flex; align-items:center; justify-content:space-between;
+            box-shadow:0 2px 12px rgba(26,86,219,.25);
+            position:relative; z-index:10;
+        }
+        [data-theme="dark"] .header {
+            background:linear-gradient(135deg,#1e3a5f,#1e40af);
+            box-shadow:0 2px 12px rgba(0,0,0,.4);
+        }
+        .header-left { display:flex; align-items:center; gap:14px; }
+        .header-logo {
+            width:44px; height:44px; background:rgba(255,255,255,.18);
+            border-radius:10px; display:grid; place-items:center;
+            font-weight:800; font-size:18px; backdrop-filter:blur(6px); flex-shrink:0;
+        }
+        .header-text h1 { font-size:17px; font-weight:700; letter-spacing:-.2px; }
+        .header-text p  { font-size:12px; font-weight:400; opacity:.85; margin-top:2px; }
+
+        .theme-toggle {
+            width:40px; height:40px; background:rgba(255,255,255,.15);
+            border:1.5px solid rgba(255,255,255,.3); border-radius:10px;
+            cursor:pointer; display:grid; place-items:center;
+            font-size:18px; transition:var(--transition);
+            backdrop-filter:blur(4px); line-height:1;
+        }
+        .theme-toggle:hover { background:rgba(255,255,255,.25); transform:rotate(20deg); }
+
+        .flash-container { padding:0 24px; margin-top:12px; }
+        .flash {
+            padding:12px 18px; border-radius:var(--radius);
+            font-size:13.5px; font-weight:500;
+            display:flex; align-items:center; gap:8px;
+            animation:slideDown .35s ease;
+        }
+        .flash-success { background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; }
+        .flash-error   { background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; }
+        .flash-warning { background:#fffbeb; color:#92400e; border:1px solid #fde68a; }
+        .flash-info    { background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; }
+        [data-theme="dark"] .flash-success { background:#052e16; color:#4ade80; border-color:#166534; }
+        [data-theme="dark"] .flash-error   { background:#350a0a; color:#fca5a5; border-color:#7f1d1d; }
+        [data-theme="dark"] .flash-warning { background:#351c05; color:#fcd34d; border-color:#78350f; }
+        [data-theme="dark"] .flash-info    { background:#0c1a35; color:#93c5fd; border-color:#1e3a5f; }
+        @keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+
+        .login-wrapper { flex:1; display:flex; align-items:center; justify-content:center; padding:40px 20px; }
+        .login-card {
+            width:100%; max-width:420px; background:var(--surface);
+            border-radius:16px; box-shadow:var(--shadow-lg); overflow:hidden;
+            animation:fadeUp .5s ease;
+        }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+        .login-card-header {
+            background:linear-gradient(135deg,var(--primary),var(--accent));
+            padding:32px 32px 28px; text-align:center; color:#fff;
+        }
+        [data-theme="dark"] .login-card-header {
+            background:linear-gradient(135deg,#1e3a5f,#1e40af);
+        }
+        .login-icon {
+            width:60px; height:60px; background:rgba(255,255,255,.18);
+            border-radius:16px; display:inline-grid; place-items:center;
+            font-size:28px; margin-bottom:14px; backdrop-filter:blur(6px);
+        }
+        .login-card-header h2 { font-size:22px; font-weight:700; }
+        .login-card-header p  { font-size:13.5px; opacity:.8; margin-top:4px; }
+
+        .login-card-body { padding:32px; }
+        .form-group { margin-bottom:22px; }
+        .form-group label { display:block; font-size:13px; font-weight:600; color:var(--text); margin-bottom:6px; }
+        .form-control {
+            width:100%; padding:12px 14px; font-size:14px; font-family:inherit;
+            border:1.5px solid var(--border); border-radius:10px;
+            background:var(--bg); color:var(--text);
+            transition:var(--transition); outline:none;
+        }
+        .form-control:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(26,86,219,.12); background:var(--surface); }
+        .form-control::placeholder { color:var(--text-muted); }
+
+        .btn {
+            display:inline-flex; align-items:center; justify-content:center; gap:8px;
+            padding:13px 24px; font-family:inherit; font-size:14.5px; font-weight:600;
+            border:none; border-radius:10px; cursor:pointer;
+            transition:var(--transition); text-decoration:none;
+        }
+        .btn-primary {
+            width:100%; background:linear-gradient(135deg,var(--primary),var(--accent));
+            color:#fff; box-shadow:0 4px 14px rgba(26,86,219,.3);
+        }
+        .btn-primary:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(26,86,219,.4); }
+        .btn-primary:active { transform:translateY(0); }
+
+        .footer { text-align:center; padding:16px; font-size:12px; color:var(--text-muted); }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <div class="header-logo">SRM</div>
+            <div class="header-text">
+                <h1>SRM Institute of Science and Technology</h1>
+                <p>Attendance Management System</p>
+            </div>
+        </div>
+        <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-container">
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <main class="login-wrapper">
+        <div class="login-card">
+            <div class="login-card-header">
+                <div class="login-icon">🔐</div>
+                <h2>Staff Login</h2>
+                <p>Enter your credentials to continue</p>
+            </div>
+            <div class="login-card-body">
+                <form method="POST" action="{{ url_for('login') }}" id="loginForm">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" class="form-control" id="username" name="username"
+                               placeholder="Enter your username" required autocomplete="username">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" id="password" name="password"
+                               placeholder="Enter your password" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="loginBtn">Sign In →</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">&copy; 2026 SRM Institute of Science and Technology. All rights reserved.</footer>
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+</body>
+</html>

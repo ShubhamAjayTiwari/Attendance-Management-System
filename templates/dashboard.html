@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Staff Dashboard - SRM Attendance Management System">
+    <title>Dashboard | SRM Attendance System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>(function(){var t=localStorage.getItem('srm-attendance-theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
+    <style>
+        *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+
+        :root {
+            --primary:#1a56db; --primary-dark:#1040a0; --primary-light:#e8effc;
+            --accent:#2563eb; --bg:#f0f4fa; --surface:#ffffff;
+            --text:#1e293b; --text-muted:#64748b; --border:#e2e8f0;
+            --radius:12px;
+            --shadow-sm:0 1px 3px rgba(0,0,0,.06);
+            --shadow-md:0 4px 24px rgba(26,86,219,.10);
+            --shadow-lg:0 12px 48px rgba(26,86,219,.14);
+            --transition:.25s cubic-bezier(.4,0,.2,1);
+        }
+        [data-theme="dark"] {
+            --primary:#3b82f6; --primary-dark:#2563eb; --primary-light:#1e293b;
+            --accent:#60a5fa; --bg:#0f172a; --surface:#1e293b;
+            --text:#e2e8f0; --text-muted:#94a3b8; --border:#334155;
+            --shadow-sm:0 1px 3px rgba(0,0,0,.3);
+            --shadow-md:0 4px 24px rgba(0,0,0,.3);
+            --shadow-lg:0 12px 48px rgba(0,0,0,.4);
+        }
+
+        body {
+            font-family:'Inter',system-ui,-apple-system,sans-serif;
+            background:var(--bg); color:var(--text);
+            min-height:100vh; display:flex; flex-direction:column;
+            transition:background .3s ease, color .3s ease;
+        }
+
+        .header {
+            background:linear-gradient(135deg,var(--primary),var(--accent));
+            color:#fff; padding:16px 32px;
+            display:flex; align-items:center; justify-content:space-between;
+            box-shadow:0 2px 12px rgba(26,86,219,.25);
+            position:sticky; top:0; z-index:10;
+        }
+        [data-theme="dark"] .header { background:linear-gradient(135deg,#1e3a5f,#1e40af); box-shadow:0 2px 12px rgba(0,0,0,.4); }
+        .header-left { display:flex; align-items:center; gap:14px; }
+        .header-logo {
+            width:42px; height:42px; background:rgba(255,255,255,.18);
+            border-radius:10px; display:grid; place-items:center;
+            font-weight:800; font-size:16px; backdrop-filter:blur(6px);
+        }
+        .header-text h1 { font-size:16px; font-weight:700; letter-spacing:-.2px; }
+        .header-text p  { font-size:11.5px; font-weight:400; opacity:.85; margin-top:1px; }
+
+        .header-actions { display:flex; gap:10px; align-items:center; }
+        .btn-logout, .btn-nav {
+            padding:9px 20px; background:rgba(255,255,255,.15); color:#fff;
+            border:1.5px solid rgba(255,255,255,.3); border-radius:8px;
+            font-family:inherit; font-size:13px; font-weight:600;
+            cursor:pointer; transition:var(--transition);
+            text-decoration:none; backdrop-filter:blur(4px);
+        }
+        .btn-logout:hover { background:rgba(255,255,255,.25); }
+
+        .theme-toggle {
+            width:40px; height:40px; background:rgba(255,255,255,.15);
+            border:1.5px solid rgba(255,255,255,.3); border-radius:10px;
+            cursor:pointer; display:grid; place-items:center;
+            font-size:18px; transition:var(--transition);
+            backdrop-filter:blur(4px); line-height:1;
+        }
+        .theme-toggle:hover { background:rgba(255,255,255,.25); transform:rotate(20deg); }
+
+        .flash-container { padding:0 32px; margin-top:16px; }
+        .flash { padding:12px 18px; border-radius:var(--radius); font-size:13.5px; font-weight:500; display:flex; align-items:center; gap:8px; animation:slideDown .35s ease; }
+        .flash-success { background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; }
+        .flash-error   { background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; }
+        .flash-warning { background:#fffbeb; color:#92400e; border:1px solid #fde68a; }
+        .flash-info    { background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; }
+        [data-theme="dark"] .flash-success { background:#052e16; color:#4ade80; border-color:#166534; }
+        [data-theme="dark"] .flash-error   { background:#350a0a; color:#fca5a5; border-color:#7f1d1d; }
+        [data-theme="dark"] .flash-warning { background:#351c05; color:#fcd34d; border-color:#78350f; }
+        [data-theme="dark"] .flash-info    { background:#0c1a35; color:#93c5fd; border-color:#1e3a5f; }
+        @keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+
+        .main { flex:1; padding:40px 32px; max-width:900px; margin:0 auto; width:100%; }
+
+        .welcome-card {
+            background:var(--surface); border-radius:16px;
+            box-shadow:var(--shadow-md); padding:36px; margin-bottom:32px;
+            animation:fadeUp .5s ease; border-left:5px solid var(--primary);
+        }
+        .welcome-card h2 {
+            font-size:26px; font-weight:800; margin-bottom:6px;
+            background:linear-gradient(135deg,var(--primary),var(--accent));
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+        }
+        .welcome-card p { color:var(--text-muted); font-size:15px; line-height:1.6; }
+        .welcome-card .subject-badge {
+            display:inline-flex; align-items:center; gap:6px;
+            background:var(--primary-light); color:var(--primary);
+            padding:6px 14px; border-radius:8px; font-size:13px; font-weight:600; margin-top:12px;
+        }
+
+        .actions-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:24px; }
+        .action-card {
+            background:var(--surface); border-radius:16px;
+            box-shadow:var(--shadow-sm); padding:32px; text-align:center;
+            transition:var(--transition); cursor:pointer;
+            text-decoration:none; color:inherit;
+            border:1.5px solid var(--border); animation:fadeUp .5s ease;
+        }
+        .action-card:nth-child(2) { animation-delay:.08s; }
+        .action-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-lg); border-color:var(--primary); }
+        .action-icon {
+            width:64px; height:64px; border-radius:16px;
+            display:inline-grid; place-items:center; font-size:30px; margin-bottom:16px;
+        }
+        .action-icon.mark   { background:linear-gradient(135deg,#dbeafe,#eff6ff); }
+        .action-icon.report { background:linear-gradient(135deg,#dcfce7,#f0fdf4); }
+        [data-theme="dark"] .action-icon.mark   { background:linear-gradient(135deg,#1e3a5f,#172554); }
+        [data-theme="dark"] .action-icon.report { background:linear-gradient(135deg,#052e16,#14532d); }
+        .action-card h3 { font-size:17px; font-weight:700; margin-bottom:6px; }
+        .action-card p { font-size:13.5px; color:var(--text-muted); line-height:1.5; }
+
+        @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+
+        .footer { text-align:center; padding:16px; font-size:12px; color:var(--text-muted); }
+
+        @media (max-width:600px) {
+            .header { padding:14px 16px; }
+            .main { padding:24px 16px; }
+            .welcome-card { padding:24px; }
+            .welcome-card h2 { font-size:22px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <div class="header-logo">SRM</div>
+            <div class="header-text">
+                <h1>SRM Institute of Science and Technology</h1>
+                <p>Attendance Management System</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+            <a href="{{ url_for('logout') }}" class="btn-logout" id="logoutBtn">Logout</a>
+        </div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-container">
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <main class="main">
+        <div class="welcome-card">
+            <h2>Welcome, {{ staff_name }}!</h2>
+            <p>You are logged in to the SRM Attendance Management System. Use the actions below to manage student attendance and view reports.</p>
+            <div class="subject-badge">📘 Subject: {{ staff_subject }}</div>
+        </div>
+
+        <div class="actions-grid">
+            <a href="{{ url_for('mark_attendance') }}" class="action-card" id="markAttendanceCard">
+                <div class="action-icon mark">📋</div>
+                <h3>Mark Attendance</h3>
+                <p>Record today's attendance for all students in your class.</p>
+            </a>
+            <a href="{{ url_for('report') }}" class="action-card" id="viewReportCard">
+                <div class="action-icon report">📊</div>
+                <h3>View Reports</h3>
+                <p>Check attendance percentages and identify students with low attendance.</p>
+            </a>
+        </div>
+    </main>
+
+    <footer class="footer">&copy; 2026 SRM Institute of Science and Technology. All rights reserved.</footer>
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Report | SRM Attendance System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>(function(){var t=localStorage.getItem('srm-attendance-theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .summary-strip { display:flex; gap:16px; margin-bottom:28px; flex-wrap:wrap; }
+        .summary-chip {
+            background:var(--surface); border-radius:12px; padding:16px 22px;
+            box-shadow:var(--shadow-sm); border:1.5px solid var(--border);
+            display:flex; flex-direction:column; gap:2px; min-width:140px;
+        }
+        .summary-chip .label { font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.4px; }
+        .summary-chip .value { font-size:22px; font-weight:800; color:var(--primary); }
+
+        .table-card {
+            background:var(--surface); border-radius:16px;
+            box-shadow:var(--shadow-md); overflow:hidden; animation:fadeUp .5s ease;
+        }
+        .table-wrapper { overflow-x:auto; }
+        table { width:100%; border-collapse:collapse; }
+        thead th {
+            padding:14px 18px; text-align:left; font-size:12px; font-weight:700;
+            text-transform:uppercase; letter-spacing:.5px;
+            color:var(--text-muted); background:var(--table-header); border-bottom:1.5px solid var(--border);
+        }
+        tbody td { padding:14px 18px; font-size:14px; border-bottom:1px solid var(--border); vertical-align:middle; }
+        tbody tr:last-child td { border-bottom:none; }
+        tbody tr:hover { background:var(--table-hover); }
+        .student-name { font-weight:600; }
+        .student-meta { font-size:12px; color:var(--text-muted); margin-top:2px; }
+
+        .pct-bar-wrapper {
+            display:flex; align-items:center; gap:10px; min-width:180px;
+        }
+        .pct-bar {
+            flex:1; height:8px; background:var(--bar-track); border-radius:4px; overflow:hidden;
+        }
+        .pct-bar-fill {
+            height:100%; border-radius:4px; transition:width .6s ease;
+        }
+        .pct-bar-fill.green { background:linear-gradient(90deg,#22c55e,#16a34a); }
+        .pct-bar-fill.red   { background:linear-gradient(90deg,#f87171,#dc2626); }
+        .pct-value { font-size:13px; font-weight:700; min-width:46px; text-align:right; }
+        .pct-value.green { color:#15803d; }
+        .pct-value.red   { color:#b91c1c; }
+
+        .badge {
+            display:inline-block; padding:4px 10px; border-radius:6px;
+            font-size:11px; font-weight:700; text-transform:uppercase;
+        }
+        .badge-safe    { background:#dcfce7; color:#15803d; }
+        .badge-danger  { background:#fef2f2; color:#b91c1c; }
+        [data-theme="dark"] .badge-safe   { background:#052e16; color:#4ade80; }
+        [data-theme="dark"] .badge-danger  { background:#350a0a; color:#fca5a5; }
+
+        .no-data {
+            padding:48px; text-align:center; color:var(--text-muted); font-size:15px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <div class="header-logo">SRM</div>
+            <div class="header-text">
+                <h1>SRM Institute of Science and Technology</h1>
+                <p>Attendance Management System</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+            <a href="{{ url_for('dashboard') }}" class="btn-nav">← Dashboard</a>
+            <a href="{{ url_for('logout') }}" class="btn-logout" id="logoutBtn">Logout</a>
+        </div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}
+    <div class="flash-container">{% for cat, msg in messages %}<div class="flash flash-{{ cat }}">{{ msg }}</div>{% endfor %}</div>
+    {% endif %}{% endwith %}
+
+    <main class="main">
+        <h2 class="page-title">Attendance Report</h2>
+        <p class="page-subtitle">Overview of student attendance percentages for your subject.</p>
+
+        {% if students %}
+        <div class="summary-strip">
+            <div class="summary-chip">
+                <span class="label">Total Students</span>
+                <span class="value">{{ students|length }}</span>
+            </div>
+            <div class="summary-chip">
+                <span class="label">Above 75%</span>
+                <span class="value" style="color:#15803d">{{ students|selectattr('percentage','ge',75)|list|length }}</span>
+            </div>
+            <div class="summary-chip">
+                <span class="label">Below 75%</span>
+                <span class="value" style="color:#b91c1c">{{ students|selectattr('percentage','lt',75)|list|length }}</span>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr>
+                        <th>#</th><th>Student</th><th>Register No</th><th>Dept / Year</th>
+                        <th>Total</th><th>Present</th><th>Attendance %</th><th>Status</th>
+                    </tr></thead>
+                    <tbody>
+                    {% for s in students %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td><div class="student-name">{{ s.name }}</div></td>
+                        <td>{{ s.register_no }}</td>
+                        <td>{{ s.department }}<div class="student-meta">Year {{ s.year }}</div></td>
+                        <td>{{ s.total_classes }}</td>
+                        <td>{{ s.present_count }}</td>
+                        <td>
+                            <div class="pct-bar-wrapper">
+                                <div class="pct-bar">
+                                    <div class="pct-bar-fill {{ 'green' if s.percentage >= 75 else 'red' }}"
+                                         style="width:{{ s.percentage }}%"></div>
+                                </div>
+                                <span class="pct-value {{ 'green' if s.percentage >= 75 else 'red' }}">{{ s.percentage }}%</span>
+                            </div>
+                        </td>
+                        <td>
+                            {% if s.percentage >= 75 %}
+                            <span class="badge badge-safe">Safe</span>
+                            {% else %}
+                            <span class="badge badge-danger">Low</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="table-card"><div class="no-data">No attendance records found. Start marking attendance to see reports here.</div></div>
+        {% endif %}
+    </main>
+    <footer class="footer">&copy; 2026 SRM Institute of Science and Technology.</footer>
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+</body>
+</html>
